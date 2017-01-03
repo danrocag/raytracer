@@ -1,13 +1,22 @@
 module Math.Ray where
     
-import GHC.TypeLits
-import Numeric.LinearAlgebra.Static
-import qualified Numeric.LinearAlgebra as LA
+import Numeric.LinearAlgebra
 
 import Codec.Picture
 
-data Ray = Ray
-    {-# UNPACK #-} !(R 3)
-    {-# UNPACK #-} !(R 3)
+type Vec3 = Vector Double
+
+data CRay = CRay
+    {-# UNPACK #-} !Vec3
+    {-# UNPACK #-} !Vec3
     {-# UNPACK #-} !PixelRGBF
     deriving Show
+
+data Ray = Ray
+    {-# UNPACK #-} !Vec3
+    {-# UNPACK #-} !Vec3
+    deriving Show
+
+parametric :: Ray -> (Double -> Vec3)
+parametric (Ray p v) k = p + scale k v
+{-# INLINE parametric #-}

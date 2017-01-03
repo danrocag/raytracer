@@ -24,13 +24,14 @@ library
                      , Core
   other-modules:       Illumination.Base
                      , Scene.Base
+                     , Scene.SimpleSphere
                      , Math.Ray
+                     , Math.Color
   build-depends:       base >= 4.7 && < 5
                      , JuicyPixels
-                     , vector
-                     , vector-th-unbox
                      , monad-par
                      , hmatrix
+                     , abstract-par
   default-language:    Haskell2010
 
 executable raytracer-exe
@@ -43,6 +44,7 @@ executable raytracer-exe
   build-depends:       base
                      , raytracer
                      , JuicyPixels
+                     , hmatrix
   default-language:    Haskell2010
 
 test-suite raytracer-test

@@ -1,15 +1,18 @@
-module Illumination.Base(Illumination(..), illuminate) where
+module Illumination.Base(Illumination, illuminate, pointLight) where
     
-import GHC.TypeLits
-import Numeric.LinearAlgebra.Static
-import qualified Numeric.LinearAlgebra as LA
+import Data.Monoid
+
+import Numeric.LinearAlgebra
 
 import Math.Color
-import Math.Ray    
+import Math.Ray
 
-data Illumination
-    = Lamp 
-        {-# UNPACK #-} !(R 3) Color
 
-illuminate :: Illumination -> R 3 -> [Ray]
-illuminate () _ = []
+newtype Illumination = Illumination {illuminate :: Vec3 -> [CRay]}
+
+instance Monoid Illumination where
+    mempty = Illumination (const [])
+    i1 `mappend` i2 = Illumination $ \v -> illuminate i1 v ++ illuminate i2 v
+
+pointLight :: Color -> Vec3 -> Illumination
+pointLight color p1 = Illumination $ \p2 -> [CRay p1 (p2-p1) color]

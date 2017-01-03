@@ -1,1 +1,1 @@
-Raytracer using Haskell with Repa
+Raytracer using Haskell
