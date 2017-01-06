@@ -6,7 +6,7 @@ import Core
 import Render
 import Codec.Picture
 import Codec.Picture.Types
-import Numeric.LinearAlgebra
+import Numeric.LinearAlgebra(vector)
 
 settings :: RenderSettings
 settings = RenderSettings {
@@ -19,14 +19,13 @@ settings = RenderSettings {
     bottomRight = vector [-1, -1,0],
     origin = vector [0,0,-1]}
 
-illumination :: Illumination
-illumination = pointLight (PixelRGBF 1 1 1) (vector [5,0,0])
-
-scene :: Scene
-scene = sphere (PixelRGBF 0 1 0) 1 (vector [0,0,3])
+scene =
+    sky white (Ray (vector [10,0,0]) (vector [-1,0,0]))
+    <> sphere green 1 (vector [0,0,5])
+    <> sky white (Ray (vector [-2,0,0]) (vector [1,0,0]))
 
 main :: IO ()
 main = do
-    img <- render settings illumination scene
+    img <- render settings scene
     savePngImage (path settings) img
     

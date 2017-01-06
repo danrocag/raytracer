@@ -1,18 +1,20 @@
 module Core(
     RenderSettings(..),
-    module Illumination.Base,
     module Scene.Base,
-    module Scene.SimpleSphere,
+    module Scene.Object.SimpleSphere,
+    module Scene.Illumination.Sky,
+    module Scene.Object.Floor,
     module Math.Color,
     module Math.Ray
     ) where
     
-import Illumination.Base
-import Scene.Base(Scene, traceRay)
-import Scene.SimpleSphere(sphere)
+import Scene.Base(Tracer, traceRay, Scene)
+import Scene.Object.SimpleSphere(sphere)
+import Scene.Illumination.Sky(sky)
 import Math.Color
 import Math.Ray
 import Numeric.LinearAlgebra
+import Scene.Object.Floor
 
 data RenderSettings  = RenderSettings {
     background :: Color,

@@ -15,18 +15,15 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  ghc-options:         -Odph -fno-liberate-case -funfolding-use-threshold1000 -funfolding-keeness-factor1000 -optlo-O3
-                       -pgmlo /usr/local/opt/llvm37/bin/opt-3.7
-                       -pgmlc /usr/local/opt/llvm37/bin/llc-3.7
-                       -fllvm
-  default-extensions:  FlexibleContexts, MultiParamTypeClasses, TemplateHaskell, TypeFamilies, UnicodeSyntax, DataKinds
+  ghc-options:        -optlo-O3
   exposed-modules:     Render
                      , Core
-  other-modules:       Illumination.Base
-                     , Scene.Base
-                     , Scene.SimpleSphere
+  other-modules:       Scene.Base
+                     , Scene.Object.SimpleSphere
+                     , Scene.Illumination.Sky
                      , Math.Ray
                      , Math.Color
+                     , Scene.Object.Floor
   build-depends:       base >= 4.7 && < 5
                      , JuicyPixels
                      , monad-par
@@ -37,10 +34,7 @@ library
 executable raytracer-exe
   hs-source-dirs:      app
   main-is:             Main.hs
-  ghc-options:         -Odph -rtsopts -threaded -fno-liberate-case -funfolding-use-threshold1000 -funfolding-keeness-factor1000 -optlo-O3 -with-rtsopts=-N
-                       -pgmlo /usr/local/opt/llvm37/bin/opt-3.7
-                       -pgmlc /usr/local/opt/llvm37/bin/llc-3.7
-                       -fllvm
+  ghc-options:         -rtsopts -threaded -optlo-O3 -with-rtsopts=-N
   build-depends:       base
                      , raytracer
                      , JuicyPixels

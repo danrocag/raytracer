@@ -10,8 +10,6 @@ import Control.Monad.Par.Class
 
 import Numeric.LinearAlgebra
 
-import Debug.Trace
-
 calc_ray :: RenderSettings -> Int -> Int -> Ray
 calc_ray settings x y =
     let
@@ -23,15 +21,13 @@ calc_ray settings x y =
         dir = point - origin settings
     in (Ray point dir)
 
-render :: RenderSettings -> Illumination -> Scene -> IO DynamicImage
-render settings illum scene = do
+render :: RenderSettings -> Scene -> IO DynamicImage
+render settings scene = do
     mut_img <- createMutableImage (width settings) (height settings) (background settings)
     let pixels = [(x,y) | x <- [1..width settings], y <- [1..height settings]]
     forM_ pixels $ \(x,y) -> do
         let ray = calc_ray settings x y
-        case (traceRay scene ray illum) of
-            Nothing -> return ()
-            Just color -> writePixel mut_img (x-1) (y-1) color
+        writePixel mut_img (x-1) (y-1) (traceRay (background settings) scene Nothing ray)
     img <- unsafeFreezeImage mut_img
     return $! ImageRGBF img
 
