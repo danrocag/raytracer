@@ -5,12 +5,9 @@ import Numeric.LinearAlgebra
 import Codec.Picture
 
 type Vec3 = Vector Double
+vec3 :: Double -> Double -> Double -> Vec3
+vec3 x y z= vector $! [x,y,z]
 
-data CRay = CRay
-    {-# UNPACK #-} !Vec3
-    {-# UNPACK #-} !Vec3
-    {-# UNPACK #-} !PixelRGBF
-    deriving Show
 
 data Ray = Ray
     {-# UNPACK #-} !Vec3

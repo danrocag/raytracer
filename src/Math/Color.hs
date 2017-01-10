@@ -4,7 +4,7 @@ import Codec.Picture.Types(PixelRGBF(..))
 import GHC.Float
 
 import Data.Foldable
-            
+
 type Color = PixelRGBF
 getRed, getGreen, getBlue :: Color -> Float
 getRed (PixelRGBF r g b) = r

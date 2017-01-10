@@ -1,27 +1,42 @@
 module Scene.Base where
     
+import Scene.Monad    
+
 import Math.Color
 import Math.Ray
 
 import Data.List(sortBy)
 import Data.Function
 
+import Control.Monad.Random
+import System.Random
+import Control.Monad.Trans
+import Data.Maybe(mapMaybe)
+
+type Trace = TracerT (Rand StdGen)
+
 type Scene = [Object]
-type Tracer = Ray -> Color
 
 data Object = Object {
-    intercept :: Ray -> Double,
-    calc_color :: Vec3 -> Tracer -> Tracer}
+    intercept :: Ray -> Maybe (Double, Ray),
+    calc :: Material}
 
-traceRay :: Color -> Scene -> Maybe Object -> Tracer
-traceRay bgcolor scene old ray =
+instance Show Object where
+    show _ = "(obj)"
+    
+type Material = Ray -> Ray -> Trace Color
+
+traceRay :: Color -> Scene -> Ray -> Rand StdGen Color
+traceRay bgcolor scene ray =
     let
-        intercepts = map (\o -> (o, intercept o ray)) scene
-        candidates = takeWhile ((<1/0) . snd) . dropWhile ((<0) . snd) $ sortBy (compare `on` snd) intercepts
+        intercepts :: [(Double,(Object,Ray))]
+        intercepts = mapMaybe (\o -> (\(k,r) -> (k,(o,r))) <$> (intercept o ray)) scene
+        candidates :: [(Double,(Object,Ray))]
+        candidates = (sortBy (compare `on` fst) intercepts)
     in case candidates of
-        [] -> bgcolor
-        (obj,k):other_objects_with_k ->
-            let
-                point = (parametric ray k)
-                other_objects = map fst other_objects_with_k
-            in (calc_color obj point (traceRay bgcolor (maybe other_objects (:other_objects) old) (Just obj)) ray)
+        [] -> return bgcolor
+        (_,(obj,normal)):other_objects_with_extra_data -> let other_objects = map (fst . snd) other_objects_with_extra_data in
+            runTracerT
+                (calc obj normal ray)
+                (traceRay bgcolor scene)
+--}

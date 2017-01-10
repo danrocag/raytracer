@@ -15,26 +15,35 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  ghc-options:        -optlo-O3
+  ghc-options:        -optlo-O3 -fllvm -O2
+                      -pgmlo /usr/local/opt/llvm@3.7/bin/opt-3.7
+                      -pgmlc /usr/local/opt/llvm@3.7/bin/llc-3.7
+  default-extensions:  DeriveFunctor, FlexibleInstances
   exposed-modules:     Render
                      , Core
   other-modules:       Scene.Base
-                     , Scene.Object.SimpleSphere
-                     , Scene.Illumination.Sky
                      , Math.Ray
+                     , Scene.Monad
                      , Math.Color
-                     , Scene.Object.Floor
+                     , Scene.Object.Plane
+                     , Scene.Material.Diffuse
+                     , Scene.Object.SimpleSphere
+                     , Scene.Material.Skylike
   build-depends:       base >= 4.7 && < 5
                      , JuicyPixels
-                     , monad-par
                      , hmatrix
-                     , abstract-par
+                     , random
+                     , deepseq
+                     , mtl
+                     , MonadRandom
   default-language:    Haskell2010
 
 executable raytracer-exe
   hs-source-dirs:      app
   main-is:             Main.hs
-  ghc-options:         -rtsopts -threaded -optlo-O3 -with-rtsopts=-N
+  ghc-options:         -rtsopts -threaded -optlo-O3 -with-rtsopts=-N -O2 -fllvm
+                       -pgmlo /usr/local/opt/llvm@3.7/bin/opt-3.7
+                       -pgmlc /usr/local/opt/llvm@3.7/bin/llc-3.7
   build-depends:       base
                      , raytracer
                      , JuicyPixels
@@ -47,7 +56,7 @@ test-suite raytracer-test
   main-is:             Spec.hs
   build-depends:       base
                      , raytracer
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N 
   default-language:    Haskell2010
 
 source-repository head

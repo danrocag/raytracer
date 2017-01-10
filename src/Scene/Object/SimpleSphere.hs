@@ -1,4 +1,4 @@
-module Scene.Object.SimpleSphere(sphere) where
+module Scene.Object.SimpleSphere where
     
 import Scene.Base
 import Math.Color
@@ -6,14 +6,14 @@ import Math.Ray
 import Numeric.LinearAlgebra
 
 -- Sphere
-sphere :: Color -> Double -> Vec3 -> Scene
-sphere color r p = [sphere' color r p]
+sphere :: Double -> Vec3 -> Material -> Scene
+sphere r p mat = [sphere' r p mat]
 
-sphere' :: Color -> Double -> Vec3 -> Object
-sphere' color r p = Object (sphere_intercept r p) (sphere_calc color r p)
+sphere' :: Double -> Vec3 -> Material -> Object
+sphere' r p = Object (sphere_intercept r p)
 
-sphere_intercept :: Double -> Vec3 -> Ray -> Double
-sphere_intercept r p (Ray o v) =
+sphere_intercept :: Double -> Vec3 -> Ray -> Maybe (Double, Ray)
+sphere_intercept r p ray@(Ray o v) =
     let
         o' = o-p
         a = v <.> v
@@ -25,18 +25,11 @@ sphere_intercept r p (Ray o v) =
             let
                 x1 = (-b + sqrt(discriminant))/a
                 x2 = (-b - sqrt(discriminant))/a
-            in case (x1 > 0, x2 > 0) of
-                (True,True) -> max x1 x2
-                (False,True) -> x2
-                (True, False) -> x1
-                (False, False) -> 1/0
-        else 1/0
+                x = case (x1 > 0, x2 > 0) of
+                    (True,True) -> Just (min x1 x2)
+                    (False,True) -> Just x2
+                    (True, False) -> Just x1
+                    (False, False) -> Nothing
 
-sphere_calc :: Color -> Double -> Vec3 -> Vec3 -> Tracer -> Tracer
-sphere_calc mat r center intersect env (Ray p v) =
-    let
-        normal = intersect - center
-        coeff = (normal <.> v)/(normal <.> normal)
-        reflected = v + scale (2*coeff) normal
-        forward_light = env (Ray intersect reflected)
-    in scaleColor coeff (multiply mat forward_light)
+            in (\lambda -> (lambda, Ray (parametric ray lambda) (parametric ray lambda - p))) <$> x
+        else Nothing
